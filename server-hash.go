@@ -15,6 +15,7 @@ type Password struct {
 }
 
 func handlePosts(w http.ResponseWriter, r *http.Request) {
+  time.Sleep(2 * time.Second)
   postPassword(w, r)
 }
 
@@ -24,7 +25,7 @@ func postPassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequests() {
-	http.HandleFunc("/", postPassword)
+	http.HandleFunc("/", handlePosts)
 	fmt.Println("Listening...")
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
