@@ -7,7 +7,6 @@ import (
 	"sync"
 	"encoding/json"
 	"crypto/sha512"
-	"encoding/base64"
 	"time"
 )
 
@@ -35,6 +34,8 @@ func main() {
 	h.w.Wait()
 }
 
+// at a new request increment wait group, decrement once scope closes
+// call default ServeHttp, call flush to make sure responses are sent
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.w.Add(1)
 	defer h.w.Done()
@@ -45,14 +46,17 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // '/'
 func hashPassword(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(5 * time.Second)
-	json.NewEncoder(w).Encode(getSHA512(r.FormValue("password")))
-}
 
-func getSHA512(pw string) string {
+	pw := r.FormValue("password")
+	if len(pw) == 0 {
+		panic("No password received")
+	}
+
 	h := sha512.New()
 	h.Write([]byte(pw))
-	sha1_hash := base64.StdEncoding.EncodeToString(h.Sum(nil))
-	return string(sha1_hash)
+
+	// byte[] encodes as base64 string
+	json.NewEncoder(w).Encode(h.Sum(nil))
 }
 
 // '/shutdown'
