@@ -3,7 +3,7 @@ Returns a base64 encoded password using SHA512.
 
 ### Install
 ```
-git clone the project
+git clone https://github.com/josephtcollins/server-hash.git
 go run server-hash.go
 ```
 
